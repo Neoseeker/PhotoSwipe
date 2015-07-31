@@ -3438,8 +3438,8 @@
 				}
 			},
 
-			// pid - Picture index
-			// gid - Gallery index
+		// pid - Picture index
+		// gid - Gallery index
 			_parseItemIndexFromURL = function () {
 				var hash = _getHash(),
 					params = {};
@@ -3520,15 +3520,8 @@
 					pid = item.pid;
 				}
 				var newHash = _initialHash + '&' + 'gid=' + _options.galleryUID + '&' + 'pid=' + pid;
-
-				if (!_historyChanged) {
-					if (_windowLoc.hash.indexOf(newHash) === -1) {
-						_urlChangedOnce = true;
-					}
-					// first time - add new hisory record, then just replace
-				}
-
 				var newURL = _windowLoc.href.split('#')[0] + '#' + newHash;
+
 				var stateObj = '';
 				// my hack
 				if (_options.urlPattern) {
@@ -3539,9 +3532,19 @@
 					stateObj = {pid: pid};
 				}
 
+				if (!_historyChanged) {
+					if ((!_options.urlPattern && _windowLoc.hash.indexOf(newHash) === -1) || (_options.urlPattern && newURL != _windowLoc.href)) {
+						_urlChangedOnce = true;
+					}
+					if (_options.urlPattern && newURL == _windowLoc.href) { // when the page is loaded with photoswipe on
+						_closedFromURL = true;
+					}
+					// first time - add new hisory record, then just replace
+				}
+
 				if (_supportsPushState) {
 
-					if ('#' + newHash !== window.location.hash) {
+					if ((!_options.urlPattern && '#' + newHash !== window.location.hash) || (_options.urlPattern && newURL != _windowLoc.href)) {
 						history[_historyChanged ? 'replaceState' : 'pushState'](stateObj, document.title, newURL);
 					}
 
