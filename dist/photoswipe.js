@@ -3445,7 +3445,7 @@
 					params = {};
 
 				// my hack
-				if (_options.urlPattern) {
+				if (typeof _options.urlPattern == 'string' && _options.urlPattern.length) {
 					var pattern = _options.urlPattern.replace('[url_path]', _options.galleryUID).replace('[pid]', '([0-9a-z]+?)');
 					var match = window.location.pathname.match(new RegExp(pattern));
 					if (match) {
@@ -3458,6 +3458,16 @@
 						}
 						return params;
 					}
+				} else if (_options.urlPattern) {
+					for (i = 0; i < _items.length; i++) {
+						var urlPattern = _items[i].urlPattern.replace('[url_path]', _items[i].url_path).replace('[pid]', _items[i].pid);
+						var match = window.location.pathname.match(new RegExp(pattern));
+						if (match) {
+							params.pid = i;
+							break;
+						}
+					}
+					return params;
 				}
 
 				if (hash.length < 5) { // pid=1
@@ -3525,8 +3535,9 @@
 				var stateObj = '';
 				// my hack
 				if (_options.urlPattern) {
+					var urlPattern = (typeof item.urlPattern == 'string' && item.urlPattern.length) ? item.urlPattern : _options.urlPattern;
 					var urlPath = (item.url_path || _options.galleryUID);
-					var urlpart = _options.urlPattern.replace('[url_path]', urlPath).replace('[pid]', pid);
+					var urlpart = urlPattern.replace('[url_path]', urlPath).replace('[pid]', pid);
 					newURL = _windowLoc.origin + urlpart;
 					newHash = '';
 					stateObj = {pid: pid};
